@@ -668,7 +668,7 @@ async function startScraping() {
             case 'url':
                 const links = doc.querySelectorAll('a');
                 links.forEach(link => {
-                    result.appendChild(createResultItem(link.textContent.trim(), link.href.replace(window.location.href,url)));
+                    result.appendChild(createResultItem(link.textContent.trim(), link.href.replace('https://nickyangtpe.github.io/',url)));
                 });
                 break;
             case 'depth':
@@ -676,7 +676,7 @@ async function startScraping() {
                 if (includeLinks) {
                     const links = doc.querySelectorAll('a');
                     links.forEach(link => {
-                        result.appendChild(createResultItem(link.textContent.trim(), link.href.replace(window.location.href,url)));
+                        result.appendChild(createResultItem(link.textContent.trim(), link.href.replace('https://nickyangtpe.github.io/',url)));
                     });
                 }
                 break;
@@ -691,7 +691,7 @@ async function startScraping() {
         if (includeLinks && method !== 'url') {
             const links = doc.querySelectorAll('a');
             links.forEach(link => {
-                result.appendChild(createResultItem(link.textContent.trim(), link.href.replace(window.location.href, url)));
+                result.appendChild(createResultItem(link.textContent.trim(), link.href.replace('https://nickyangtpe.github.io/', url)));
             });
         }
 
