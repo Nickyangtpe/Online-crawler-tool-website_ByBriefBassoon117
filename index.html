@@ -379,9 +379,20 @@ function createResultItem(text, url) {
     textDiv.textContent = text;
     resultItem.appendChild(textDiv);
 
+    // Fix relative URLs
+    let displayUrl = url;
+    try {
+        // Get the base URL from the input field
+        const baseUrl = new URL(document.getElementById('url').value);
+        // Try to resolve the URL
+        displayUrl = new URL(url, baseUrl.origin).href;
+    } catch (e) {
+        console.error('URL parsing error:', e);
+    }
+
     const urlDiv = document.createElement('div');
     urlDiv.className = 'result-url';
-    urlDiv.textContent = url;
+    urlDiv.textContent = displayUrl;
     resultItem.appendChild(urlDiv);
 
     const copyBtn = document.createElement('button');
@@ -392,7 +403,7 @@ function createResultItem(text, url) {
 
     copyBtn.addEventListener('click', async () => {
         try {
-            const content = `${text}\n${url}`;
+            const content = `${text}\n${displayUrl}`;
             await navigator.clipboard.writeText(content);
             copyBtn.classList.add('copied');
             setTimeout(() => {
@@ -657,7 +668,7 @@ async function startScraping() {
             case 'url':
                 const links = doc.querySelectorAll('a');
                 links.forEach(link => {
-                    result.appendChild(createResultItem(link.textContent.trim(), link.href));
+                    result.appendChild(createResultItem(link.textContent.trim(), link.href.replace(window.location.href,url)));
                 });
                 break;
             case 'depth':
@@ -665,7 +676,7 @@ async function startScraping() {
                 if (includeLinks) {
                     const links = doc.querySelectorAll('a');
                     links.forEach(link => {
-                        result.appendChild(createResultItem(link.textContent.trim(), link.href));
+                        result.appendChild(createResultItem(link.textContent.trim(), link.href.replace(window.location.href,url)));
                     });
                 }
                 break;
@@ -680,7 +691,7 @@ async function startScraping() {
         if (includeLinks && method !== 'url') {
             const links = doc.querySelectorAll('a');
             links.forEach(link => {
-                result.appendChild(createResultItem(link.textContent.trim(), link.href));
+                result.appendChild(createResultItem(link.textContent.trim(), link.href.replace(window.location.href, url)));
             });
         }
 
