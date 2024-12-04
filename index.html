@@ -1,0 +1,713 @@
+<html><head><base href="/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>線上快速爬蟲工具</title>
+<style>
+body {
+    font-family: "Microsoft JhengHei", Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    width: 95%;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+h1 {
+    color: #6366f1;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+h1:hover {
+    transform: scale(1.05);
+    color: #4f46e5;
+}
+
+.input-group {
+    margin-bottom: 25px;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.input-group:hover {
+    transform: translateY(-5px);
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #4f46e5;
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
+
+label:hover {
+    color: #6366f1;
+}
+
+.checkbox-group {
+    margin: 20px 0;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.checkbox-item:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+input[type="url"], select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    box-sizing: border-box;
+}
+
+input[type="url"]:focus, select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    transform: scale(1.02);
+}
+
+button {
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:disabled {
+    background: linear-gradient(45deg, #9ca3af, #6b7280);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.update-key-btn:disabled {
+    background: linear-gradient(45deg, #9ca3af, #6b7280);
+}
+
+button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+#result {
+    margin-top: 25px;
+    padding: 0;
+    border-radius: 12px;
+    background: transparent;
+    min-height: 100px;
+    font-size: 15px;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+.result-item {
+    position: relative;
+    padding-right: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.result-text {
+    color: #333;
+    font-weight: 500;
+}
+
+.result-url {
+    color: #6366f1;
+    word-break: break-all;
+    font-family: monospace;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: #e0e0e0;
+    transform: scale(1.1);
+}
+
+.copy-btn svg {
+    width: 16px;
+    height: 16px;
+    transition: all 0.3s ease;
+}
+
+.copy-btn.copied {
+    background: #4CAF50;
+}
+
+.copy-btn.copied svg {
+    transform: scale(0);
+    opacity: 0;
+}
+
+.copy-btn.copied::after {
+    content: 'copy';
+    color: white;
+    font-size: 12px;
+    position: absolute;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.progress-container {
+    display: none;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    margin-top: 10px;
+    color: #4f46e5;
+    font-weight: 600;
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.error-message {
+    position: relative;
+    top: unset;
+    right: unset;
+    background: #ff4444;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards;
+}
+
+.success-message {
+    position: relative;
+    top: unset;
+    right: unset;
+    background: #22c55e;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.update-key-btn {
+    background: linear-gradient(45deg, #22c55e, #16a34a);
+    margin-bottom: 20px;
+}
+
+.update-key-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+}
+
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    .container { padding: 20px; }
+    h1 { font-size: 1.8em; }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.5em; }
+    .container { padding: 15px; }
+    label { font-size: 1em; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>線上快速爬蟲工具</h1>
+    
+    <div class="input-group">
+        <label for="url">網址：</label>
+        <input type="url" id="url" placeholder="https://example.com" required>
+    </div>
+    
+    <div class="input-group">
+        <label for="method">爬取方式：</label>
+        <select id="method" required onchange="handleMethodChange()">
+            <option value="">請選擇爬取方式</option>
+            <option value="text">純文字爬蟲</option>
+            <option value="url">連結爬蟲</option>
+            <option value="depth">深度爬蟲（多重爬蟲）</option>
+            <option value="picture">圖片爬蟲</option>
+        </select>
+    </div>
+
+    <div class="checkbox-group">
+        <div class="checkbox-item">
+            <input type="checkbox" id="includeLinks">
+            <label for="includeLinks">包含連結</label>
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox" id="useProxy" checked>
+            <label for="useProxy">使用代理</label>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <button onclick="updateApiKey()" class="update-key-btn">
+            更新API接口Key
+        </button>
+    </div>
+    
+    <button onclick="startScraping()">開始爬取</button>
+    
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="progress-text" id="progressText">處理中... 0%</div>
+    </div>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+function createResultItem(text, url) {
+    const resultItem = document.createElement('div');
+    resultItem.className = 'result-item';
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'result-text';
+    textDiv.textContent = text;
+    resultItem.appendChild(textDiv);
+
+    const urlDiv = document.createElement('div');
+    urlDiv.className = 'result-url';
+    urlDiv.textContent = url;
+    resultItem.appendChild(urlDiv);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+    </svg>`;
+
+    copyBtn.addEventListener('click', async () => {
+        try {
+            const content = `${text}\n${url}`;
+            await navigator.clipboard.writeText(content);
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        } catch (err) {
+            showError('複製失敗');
+        }
+    });
+
+    resultItem.appendChild(copyBtn);
+    return resultItem;
+}
+
+function showError(message) {
+    let container = document.querySelector('.message-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'message-container';
+        document.body.appendChild(container);
+    }
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    container.appendChild(errorDiv);
+    
+    setTimeout(() => {
+        errorDiv.remove();
+        if (container.children.length === 0) {
+            container.remove();
+        }
+    }, 3000);
+}
+
+function showSuccess(message) {
+    let container = document.querySelector('.message-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'message-container';
+        document.body.appendChild(container);
+    }
+
+    const successDiv = document.createElement('div');
+    successDiv.className = 'success-message';
+    successDiv.textContent = message;
+    container.appendChild(successDiv);
+    
+    setTimeout(() => {
+        successDiv.remove();
+        if (container.children.length === 0) {
+            container.remove();
+        }
+    }, 3000);
+}
+
+async function checkUrlValidity(url) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        throw new Error('網址必須以 http:// 或 https:// 開頭');
+    }
+    return true;
+}
+
+function handleMethodChange() {
+    const method = document.getElementById('method').value;
+    const includeLinksCheckbox = document.getElementById('includeLinks');
+    
+    if (method === 'url') {
+        includeLinksCheckbox.checked = true;
+        includeLinksCheckbox.disabled = true;
+    } else {
+        includeLinksCheckbox.disabled = false;
+    }
+}
+
+let APIKey = null;
+
+async function generatAPI() {
+  try {
+    disableAllButtons();
+    const progressContainer = document.getElementById('progressContainer');
+    const progress = document.getElementById('progress');
+    const progressText = document.getElementById('progressText');
+
+    
+        progress.style.width = '20%';
+        progressText.textContent = '生成臨時信箱... 20%';
+    // Generate email
+    const emailResponse = await fetch('https://www.1secmail.com/api/v1/?action=genRandomMailbox&count=1');
+    const [email] = await emailResponse.json();
+    const [username, domain] = email.split('@');
+    console.log('Generated email:', email);
+
+    // Wait for 1 second
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Waited for 1 second');
+try{
+    // Send request
+    const postResponse = await fetch('https://services.cors.sh/onboarding/with-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': 'https://cors.sh',
+        'Referer': 'https://cors.sh/',
+      },
+      body: JSON.stringify({ email }),
+    });
+}catch(error){};
+    console.log('POST request sent');
+
+    
+        progress.style.width = '50%';
+        progressText.textContent = '請求獲取API Key... 50%';
+    // Wait for 2 seconds
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log('Waited for 2 seconds');
+
+    // Get messages
+    const messagesResponse = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${username}&domain=${domain}`);
+  
+        progress.style.width = '80%';
+        progressText.textContent = '獲取API Key... 80%';
+    const messages = await messagesResponse.json();
+    console.log('Retrieved messages:', messages.length);
+
+    // Check each message for temp_***** patterncontainer.className
+    for (const message of messages) {
+      const contentResponse = await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${message.id}`);
+
+      progress.style.width = '80%';
+        progressText.textContent = '獲取API Key... 80%';
+      
+      const content = await contentResponse.json();
+      const emailBody = content.body || content.textBody || content.htmlBody || '';
+
+        
+        
+      const match = emailBody.match(/temp_\w+/);
+      if (match) {
+        APIKey = match[0];
+          showSuccess('API Key更新成功！');
+        return;
+      }
+    }
+
+    showError('更新API Key失敗');
+  } catch (error) {
+    showError('更新API Key失敗：' + error.message);
+  }
+}
+
+function disableAllButtons() {
+  document.querySelector('.update-key-btn').disabled = true;
+  document.querySelector('button:last-of-type').disabled = true; // Start scraping button
+}
+
+function enableAllButtons() {
+  document.querySelector('.update-key-btn').disabled = false;
+  document.querySelector('button:last-of-type').disabled = false;
+}
+
+async function updateApiKey() {
+    disableAllButtons();
+    const progressContainer = document.getElementById('progressContainer');
+    const progress = document.getElementById('progress');
+    const progressText = document.getElementById('progressText');
+    
+    try {
+        progressContainer.style.display = 'block';
+        
+        progress.style.width = '20%';
+        progressText.textContent = '生成臨時信箱... 20%';
+        
+        await generatAPI();
+        
+        progress.style.width = '100%';
+        progressText.textContent = '完成！ 100%';
+        
+        setTimeout(() => {
+            progressContainer.style.display = 'none';
+            progress.style.width = '0%';
+        }, 3000);
+        
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        enableAllButtons();
+    }
+}
+
+async function startScraping() {
+    disableAllButtons();
+    
+    const url = document.getElementById('url').value;
+    const method = document.getElementById('method').value;
+    const includeLinks = document.getElementById('includeLinks').checked;
+    const useProxy = document.getElementById('useProxy').checked;
+    
+    const progressContainer = document.getElementById('progressContainer');
+    const progress = document.getElementById('progress');
+    const progressText = document.getElementById('progressText');
+    const result = document.getElementById('result');
+    
+    if (!url || !method) {
+        showError('請填寫網址和選擇爬取方式');
+        enableAllButtons();
+        return;
+    }
+    
+    progressContainer.style.display = 'block';
+    result.innerHTML = '';
+    
+    try {
+        progress.style.width = '10%';
+        progressText.textContent = '檢查網址有效性... 10%';
+        await checkUrlValidity(url);
+        
+        progress.style.width = '20%';
+        progressText.textContent = '正在連接網站... 20%';
+        
+        let fetchUrl = url;
+        let fetchOptions = {};
+        
+        if(useProxy) {
+          if(APIKey==null){
+            throw new Error('請先更新API Key!');
+            enableAllButtons();
+            return;
+          }
+            fetchUrl = `https://proxy.cors.sh/${url}`;
+            
+            fetchOptions.headers = {
+                'x-cors-api-key': APIKey
+            };
+        }
+        
+        const response = await fetch(fetchUrl, fetchOptions);
+        
+        if (!response.ok) {
+            throw new Error('網站回應異常');
+        }
+        
+        progress.style.width = '40%';
+        progressText.textContent = '正在讀取內容... 40%';
+        
+        const html = await response.text();
+        
+        progress.style.width = '60%';
+        progressText.textContent = '正在解析內容... 60%';
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        progress.style.width = '80%';
+        progressText.textContent = '正在處理資料... 80%';
+        
+        switch(method) {
+            case 'text':
+                result.appendChild(createResultItem(doc.body.innerText, url));
+                break;
+            case 'url':
+                const links = doc.querySelectorAll('a');
+                links.forEach(link => {
+                    result.appendChild(createResultItem(link.textContent.trim(), link.href));
+                });
+                break;
+            case 'depth':
+                result.appendChild(createResultItem(doc.body.innerText, url));
+                if (includeLinks) {
+                    const links = doc.querySelectorAll('a');
+                    links.forEach(link => {
+                        result.appendChild(createResultItem(link.textContent.trim(), link.href));
+                    });
+                }
+                break;
+            case 'picture':
+                const images = doc.querySelectorAll('img');
+                images.forEach(img => {
+                    result.appendChild(createResultItem(img.alt || '未命名圖片', img.src));
+                });
+                break;
+        }
+
+        if (includeLinks && method !== 'url') {
+            const links = doc.querySelectorAll('a');
+            links.forEach(link => {
+                result.appendChild(createResultItem(link.textContent.trim(), link.href));
+            });
+        }
+
+        progress.style.width = '100%';
+        progressText.textContent = '完成！ 100%';
+        
+        setTimeout(() => {
+            progressContainer.style.display = 'none';
+            progress.style.width = '0%';
+        }, 3000);
+        
+    } catch (error) {
+        showError(error.message);
+        result.textContent = `發生錯誤：${error.message}`;
+        progressContainer.style.display = 'none';
+        progress.style.width = '0%';
+    } finally {
+        enableAllButtons();
+    }
+}
+
+document.getElementById('url').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        startScraping();
+    }
+});
+
+handleMethodChange();
+</script>
+</body></html>
